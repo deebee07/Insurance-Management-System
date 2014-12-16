@@ -1,0 +1,419 @@
+package com.dao;
+
+import java.sql.Connection;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.TreeMap;
+
+import com.util.Service;
+import com.model.ClaimProcessing;
+
+public class ClaimDAO 
+{  
+   Connection con=  null;
+   PreparedStatement ps=null;
+   ResultSet rs=null;
+	
+   public String submitClaim(int custId,String policyRefNum,ClaimProcessing obj)
+	{   
+	  String claimId=null;
+		try{
+			con= DBConnection.getConnection();
+			ps=con.prepareStatement("Insert into groupe_claimprocessing (claim_id,policy_refnum,cust_id,claim_amount,claim_subdate,claim_status," +
+					"ben_name,ben_address,ben_email,ben_contact,ben_age) values ('CL'||CLSEQ.nextval,?,?,?,?,?,?,?,?,?,?)");
+			ps.setString(1,policyRefNum );
+			ps.setInt(2,custId );
+			ps.setDouble(3,obj.getClaimAmount() );
+			ps.setString(4,obj.getClaimSubmissionDate());
+			ps.setString(5,"OPEN");
+			ps.setString(6,obj.getBenName());
+			ps.setString(7,obj.getBenAddress());
+			ps.setString(8,obj.getBenEmail());
+			ps.setLong(9,obj.getBenContactNo());
+			ps.setInt(10,obj.getBenAge());
+			System.out.println("inside dao");
+			ps.executeUpdate();
+			con.commit();
+			
+			ps=con.prepareStatement("Select 'CL'||CLSEQ.currval as ID from dual");
+			
+			rs=ps.executeQuery();
+			while(rs.next())
+			{
+				claimId=rs.getString("ID");
+				System.out.println(claimId);
+			}
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			DBConnection.closeResultSet(rs);
+			DBConnection.closeStatement(ps);
+			DBConnection.closeConnection(con);
+		}
+		return claimId;
+	}
+	
+	public boolean modifyClaim(ClaimProcessing obj)
+	{
+		boolean check=false;
+		try
+		{
+			con= DBConnection.getConnection();
+			ps=con.prepareStatement("Update groupe_claimprocessing set claim_amount=?,ben_name=?,ben_address=?,ben_email=?,ben_contact=?,ben_age=? where claim_id=? and claim_status=?");
+			
+			ps.setDouble(1,obj.getClaimAmount());
+			ps.setString(2,obj.getBenName());
+			ps.setString(3,obj.getBenAddress());
+			ps.setString(4,obj.getBenEmail());
+			ps.setLong(5,obj.getBenContactNo());
+			ps.setDouble(6,obj.getBenAge());
+			ps.setString(7,obj.getClaimId());
+			ps.setString(8,"OPEN");
+			ps.executeUpdate();
+			con.commit();
+			check=true;
+			
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			DBConnection.closeResultSet(rs);
+			DBConnection.closeStatement(ps);
+			DBConnection.closeConnection(con);
+		}
+		return check;
+	}
+	
+	public ClaimProcessing getClaimDetails(String claimId,String officer)
+	{   
+		
+		ClaimProcessing claimProcessing=null;
+		try
+		{
+			con= DBConnection.getConnection();
+			ps=con.prepareStatement("Select claim_subdate,claim_status,claim_amount,ben_name,ben_address,ben_email,ben_contact,ben_age from  groupe_claimprocessing where claim_Id=? and policy_refnum like ?");
+			ps.setString(1, claimId);
+			ps.setString(2,officer);
+			rs=ps.executeQuery();
+			while(rs.next())
+			{
+				claimProcessing=new ClaimProcessing(); 
+			
+				claimProcessing.setClaimSubmissionDate(rs.getString("claim_subdate"));
+				claimProcessing.setClaimStatus(rs.getString("claim_status"));
+				claimProcessing.setClaimAmount(rs.getDouble("claim_amount"));
+				claimProcessing.setBenName(rs.getString("ben_name"));
+				claimProcessing.setBenAddress(rs.getString("ben_address"));
+				claimProcessing.setBenEmail(rs.getString("ben_email"));
+				claimProcessing.setBenContactNo(rs.getLong("ben_contact"));
+				claimProcessing.setBenAge(rs.getInt("ben_age"));
+				
+			}
+		
+			
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			DBConnection.closeResultSet(rs);
+			DBConnection.closeStatement(ps);
+			DBConnection.closeConnection(con);
+		}
+		
+		return claimProcessing;
+		
+	}
+	
+	
+	
+	public ClaimProcessing getClaimDetailsForAdmin(String claimId)
+	{   
+	    ClaimProcessing claimProcessing=null;
+	    boolean rowexist=false;
+		try
+		{
+		con= DBConnection.getConnection();
+		ps=con.prepareStatement("Select claim_subdate,claim_status,claim_amount,ben_name,ben_address,ben_email,ben_contact,ben_age from  groupe_claimprocessing where claim_Id=? and claim_status=?");
+		ps.setString(1, claimId);
+		ps.setString(2, "OPEN");
+		rs=ps.executeQuery();
+		if(rs!=null)
+		{
+			rowexist=true;
+		}
+		while(rs.next())
+		{
+			
+			claimProcessing=new ClaimProcessing();
+			claimProcessing.setClaimSubmissionDate(rs.getString("claim_subdate"));
+			claimProcessing.setClaimStatus(rs.getString("claim_status"));
+			claimProcessing.setClaimAmount(rs.getDouble("claim_amount"));
+			claimProcessing.setBenName(rs.getString("ben_name"));
+			claimProcessing.setBenAddress(rs.getString("ben_address"));
+			claimProcessing.setBenEmail(rs.getString("ben_email"));
+			claimProcessing.setBenContactNo(rs.getLong("ben_contact"));
+			claimProcessing.setBenAge(rs.getInt("ben_age"));
+			
+		}
+	
+		
+	}
+	catch(SQLException e)
+	{
+		e.printStackTrace();
+	}
+	finally
+	{
+		DBConnection.closeResultSet(rs);
+		DBConnection.closeStatement(ps);
+		DBConnection.closeConnection(con);
+	}
+	
+	return claimProcessing;
+	
+	}
+	
+	public ClaimProcessing getClaimStatusReason(String claimId,String officer)
+	{   
+		
+		ClaimProcessing claimProcessing=null;
+		try
+		{
+			con= DBConnection.getConnection();
+			ps=con.prepareStatement("Select claim_status,rej_reason from  groupe_claimprocessing where claim_Id=? and policy_refnum like ?");
+			ps.setString(1, claimId);
+			ps.setString(2, officer);
+			rs=ps.executeQuery();
+			while(rs.next())
+			{
+				claimProcessing=new ClaimProcessing(); 
+				claimProcessing.setClaimStatus(rs.getString("claim_status"));
+				claimProcessing.setRejReason(rs.getString("rej_reason"));
+				
+			}
+		
+			
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			DBConnection.closeResultSet(rs);
+			DBConnection.closeStatement(ps);
+			DBConnection.closeConnection(con);
+		}
+		
+		return claimProcessing;
+		
+	}
+	
+	
+	public String approve_Claim(String claimId,String status)
+	{
+		System.out.println("DAO HERE");
+		
+		try
+		{
+			con= DBConnection.getConnection();
+			ps=con.prepareStatement("update groupe_claimprocessing set claim_status=? where claim_id=?");
+			
+			ps.setString(1,status);
+			ps.setString(2,claimId);
+			int y=ps.executeUpdate();
+			System.out.println("y:" + y + "status:" + status + "claimid:" + claimId);
+			con.commit();
+			
+				
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			DBConnection.closeResultSet(rs);
+			DBConnection.closeStatement(ps);
+			DBConnection.closeConnection(con);
+		}
+		
+		return status;
+	}
+	
+	public String reject_Claim(String claimId,String status,String reason)
+	{
+		try
+	{
+		con= DBConnection.getConnection();
+		ps=con.prepareStatement("update groupe_claimprocessing set claim_status=?,rej_reason=? where claim_id=?");
+		
+		ps.setString(1,status);
+		ps.setString(2,reason );
+		ps.setString(3,claimId);
+		int y=ps.executeUpdate();
+		System.out.println("y:" + y + "status:" + status + "claimid:" + claimId);
+		con.commit();
+	}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			DBConnection.closeResultSet(rs);
+			DBConnection.closeStatement(ps);
+			DBConnection.closeConnection(con);
+		}
+		
+		return status;
+	}
+		
+	public boolean deleteClaim(String claimId)
+	{   
+		boolean delete=false;
+		try
+		{
+		con= DBConnection.getConnection();
+		ps=con.prepareStatement("Delete from groupe_claimprocessing where claim_Id=? and claim_status=?");
+		ps.setString(1,claimId);
+		ps.setString(2,"OPEN");
+		int d=ps.executeUpdate();
+		
+		if(d!=0)
+			{
+			  delete=true;
+			}
+		
+		
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			DBConnection.closeResultSet(rs);
+			DBConnection.closeStatement(ps);
+			DBConnection.closeConnection(con);
+		}
+		
+		System.out.println("delete:" + delete);
+		return delete;
+	}
+	
+	public ArrayList<String> getAllPolicyRefNum()
+	{   
+		
+		ArrayList<String> allPolicyRefNums=new ArrayList<String>();
+		try
+		{
+			con= DBConnection.getConnection();
+			ps=con.prepareStatement("Select policy_refnum from  groupe_claimprocessing");
+			
+			rs=ps.executeQuery();
+			while(rs.next())
+			{
+				allPolicyRefNums.add(rs.getString("policy_refnum"));
+				
+			}
+		
+			
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			DBConnection.closeResultSet(rs);
+			DBConnection.closeStatement(ps);
+			DBConnection.closeConnection(con);
+		}
+		
+		return allPolicyRefNums;
+		
+	}
+	
+	/*public ArrayList<String> getAllEmailIds()
+	{
+		ArrayList<String> allEmailIds=new ArrayList<String>();
+	try
+	{
+		con= DBConnection.getConnection();
+		ps=con.prepareStatement("Select ben_email from  groupe_claimprocessing");
+		
+		rs=ps.executeQuery();
+		while(rs.next())
+		{
+			allEmailIds.add(rs.getString("ben_email"));
+			
+		}
+	
+		
+	}
+	catch(SQLException e)
+	{
+		e.printStackTrace();
+	}
+	finally
+	{
+		DBConnection.closeResultSet(rs);
+		DBConnection.closeStatement(ps);
+		DBConnection.closeConnection(con);
+	}
+	
+	return allEmailIds;
+	
+   }*/
+	
+	public ArrayList<String> getAllClaimId()
+	{   
+		
+		ArrayList<String> allClaimId=new ArrayList<String>();
+		try
+		{
+			con= DBConnection.getConnection();
+			ps=con.prepareStatement("Select claim_id from  groupe_claimprocessing");
+			
+			rs=ps.executeQuery();
+			while(rs.next())
+			{
+				allClaimId.add(rs.getString("claim_id"));
+				
+			}
+		
+			
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			DBConnection.closeResultSet(rs);
+			DBConnection.closeStatement(ps);
+			DBConnection.closeConnection(con);
+		}
+		
+		return allClaimId;
+		
+	}
+	
+}
+	
+

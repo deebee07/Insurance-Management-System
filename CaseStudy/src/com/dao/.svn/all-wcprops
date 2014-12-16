@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/AHD10/!svn/ver/8677/aja41/pd/groupe/projects/src/com/dao
+END
+PolicyDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/AHD10/!svn/ver/8677/aja41/pd/groupe/projects/src/com/dao/PolicyDao.java
+END
+CustomerDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/AHD10/!svn/ver/10285/aja41/pd/groupe/projects/src/com/dao/CustomerDao.java
+END
+DBConnection.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/AHD10/!svn/ver/2004/aja41/pd/groupe/projects/src/com/dao/DBConnection.java
+END
+ClaimDAO.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/AHD10/!svn/ver/8676/aja41/pd/groupe/projects/src/com/dao/ClaimDAO.java
+END
+LoginDao.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/AHD10/!svn/ver/8641/aja41/pd/groupe/projects/src/com/dao/LoginDao.java
+END

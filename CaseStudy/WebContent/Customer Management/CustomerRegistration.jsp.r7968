@@ -1,0 +1,179 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+    <% response.setHeader( "Cache-Control", "no-store, no-cache, must-revalidate");  //HTTP 1.1
+         response.setHeader("Pragma","no-cache"); //HTTP 1.0
+         response.setDateHeader ("Expires", -1); //prevents caching at the proxy server
+         
+         if(request.getSession(false).getAttribute("userid")==null)
+         {
+        %>
+        
+        <jsp:forward page="${pageContext.request.contextPath}/../LoginPage.jsp"></jsp:forward>
+        <% 
+         }
+    %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/projectStyle.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/Reg1.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/Reg2.css">
+<title>Customer Forms</title>		
+		
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/validation.js"></script> 
+<title>CUSTOMER REGISTRATION FORM</title>
+</head>
+	<body class="bg-cyan">
+<% 
+
+HttpSession loginSession = request.getSession(true);
+String loginName=(String)loginSession.getAttribute("userid");
+
+
+%>
+
+	
+<div class=header>
+
+<img alt="India Assurance" src="<%=request.getContextPath()%>/img/department (1).gif" align="left" >
+Welcome <%=loginName %>	
+<a href="<%=request.getContextPath()%>/HomePage.jsp">HOME</a> |
+<a href="<%=request.getContextPath()%>/LoginController">LOG OUT</a>
+
+</div>
+
+		<div class="body body-s">
+		
+<% 
+String invalid= (String) request.getAttribute("invalid");
+
+if(invalid!=null){
+%>
+<center><h1><font color="red"><b> <%=invalid %></b></font></h1></center>
+<%} %>
+		
+<form  action="<%=request.getContextPath()%>/Controller" name="formCustomer" method="post" onsubmit="return validate();"class="form">
+			<fieldset>
+				<header>CUSTOMER REGISTRATION FORM</header>
+				
+									
+					<section>
+						<label class="input" for="name">
+							<i class="icon-append icon-user"></i>
+							<input type="text" placeholder="Customer name" name="name" id ="name"  onblur="return ValidateName(document.formCustomer.name);">
+							<b class="tooltip tooltip-bottom-right"><font color="red">Required Field *</font></b>
+						</label>
+					</section>
+					
+					<section>
+						<label class="input" for="dob">
+							<i class="icon-append icon-dob"></i>
+							<input type="text" placeholder="Date Of Birth" name="dob" id ="dob"   onblur="return validateDate(document.formCustomer.dob);" >
+							<b class="tooltip tooltip-bottom-right"><font color="red">Required Field * DD/MM/YYYY Format</font></b>
+						</label>
+					</section>
+					
+					
+		
+		            <section>
+						<label class="input" for="email">
+							<i class="icon-append icon-email"></i>
+							<input type="text" placeholder="Email" name="email" id ="email" onblur="return ValidateEmail(document.formCustomer.email);" >
+							<b class="tooltip tooltip-bottom-right"><font color="red">Required Field *</font></b>
+						</label>
+					</section>
+		
+	
+			      
+						<label class="input" for="address">
+							<i class="icon-append icon-addr"></i>
+							<textarea placeholder="-------------------Customer Address-------------------"  name="address" id="address" rows="4" cols="40" style="font-family: inherit; font-size:medium;" onblur="return ValidateAddress(document.formCustomer.address);" ></textarea>
+							<b class="tooltip tooltip-bottom-right"><font color="red">Required Field *</font></b>
+						</label>
+					
+		<br>
+		
+		          <section>
+						<label class="input" for="number">
+							<i class="icon-append icon-contact"></i>
+							<input type="text" placeholder="Contact Number" name="number"id="number" onblur="return ValidateNumber(document.formCustomer.number);"></input> 
+							<b class="tooltip tooltip-bottom-right"><font color="red">Required Field *</font></b>
+						</label>
+					</section>
+		
+		 
+		 
+					<section>
+						<label class="select" for="photoproof" >
+							<i class="icon-append icon-proof"></i>
+							<select name="photoproof" id="photoproof" onblur="return validatePhotoProof();" >
+			                 <option value="photoproof">Photo Proof</option>  
+							 <option value="pancard">Pan Card</option>
+							 <option value="passport">Passport</option>
+							 <option value="drivinglicense">Driving Licence</option>
+							 <option value="voteridcard">Voter Id Card</option>
+							</select>
+							<i></i>
+							<b class="tooltip tooltip-bottom-right"><font color="red">Required Field *</font></b>
+						</label>
+					</section>
+					
+					<section>
+						<label class="input" for="photoid">
+							<i class="icon-append icon-pid"></i>
+							<input type="text" placeholder="Photo Unique Id" name="photoid" id ="photoid" onblur="return validatePhotoId();" ></input>
+							<b class="tooltip tooltip-bottom-right"><font color="red">Required Field *</font></b>
+						</label>
+					</section>
+					
+					
+					<section>
+						<label class="select" for="addrproof" >
+							<i class="icon-append icon-aproof"></i>
+							<select  name="addrproof" id="addrproof" onblur="return validateAddressProof();"  >
+			                <option value="addressproof">Address Proof</option>
+							<option value="electricitybill">Electricity Bill</option>
+							<option value="waterbill">Water Bill</option>
+							<option value="rationcard">Ration Card</option>
+							<option value="aadharcard">Aadhar Card</option>
+							</select>
+							<i></i>
+							<b class="tooltip tooltip-bottom-right"><font color="red">Required Field *</font></b>
+						</label>
+					</section>
+					
+					
+			       <section>
+						<label class="input" for="addressid">
+							<i class="icon-append icon-aid"></i>
+							<input type="text" placeholder="Address Proof Unique Id" type="text" name="addressid" id ="addressid" onblur="return validateAddressId();" ></input>
+							<b class="tooltip tooltip-bottom-right"><font color="red">Required Field *</font></b>
+						</label>
+					</section>
+					
+	
+				
+				<footer>
+					<input type="submit" value="Register" class="button" >
+				</footer>
+				</fieldset>
+			</form>
+			
+		</div>
+		
+
+<% 
+HttpSession sessionn = request.getSession(true);
+sessionn.setAttribute("custAction", "addCustomer");
+%>		
+<div class=footer>
+Copyright © 2014 <a href="#">newindiaassurance@ltd</a>
+</div>
+
+
+
+
+</body>
+</html>
